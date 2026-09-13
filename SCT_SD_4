@@ -1,0 +1,29 @@
+Create a program that extracts product information, such as names, prices, and ratings, from an online e-commerce website and stores the data in a structured format like a CSV file.
+
+import requests
+from bs4 import BeautifulSoup
+import pandas as pd
+
+# Example: scraping products from a demo e-commerce site
+URL = "https://webscraper.io/test-sites/e-commerce/static/computers/laptops"
+response = requests.get(URL)
+soup = BeautifulSoup(response.text, "html.parser")
+
+products = []
+for item in soup.select(".thumbnail"):
+    name = item.select_one(".title").get_text(strip=True)
+    price = item.select_one(".price").get_text(strip=True)
+    rating = item.select_one(".ratings .glyphicon-star")
+    stars = len(item.select(".ratings .glyphicon-star"))  # count stars
+    
+    products.append({
+        "Name": name,
+        "Price": price,
+        "Rating": stars
+    })
+
+# Save to CSV
+df = pd.DataFrame(products)
+df.to_csv("products.csv", index=False)
+
+print("Scraping complete. Data saved to products.csv")
